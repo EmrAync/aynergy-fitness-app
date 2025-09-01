@@ -1,58 +1,93 @@
 // src/pages/ProgressPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { db } from '../services/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
-import WeightProgressChart from '../components/progress/WeightProgressChart';
-import Card from '../components/common/Card';
 import { useLanguage } from '../contexts/LanguageContext';
-import SkeletonCard from '../components/common/SkeletonCard'; // Import SkeletonCard
+import { db } from '../services/firebase';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import Card from '../components/common/Card';
+import SkeletonCard from '../components/common/SkeletonCard'; // Skeleton'ı import ediyoruz
+
+// Chart.js bileşenlerini kaydet
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const ProgressPage = () => {
   const { currentUser } = useAuth();
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true); // Loading state
+  const { t } = useLanguage();
+  const [chartData, setChartData] = useState(null);
+  const [loading, setLoading] = useState(true); // Yüklenme state'i
 
   useEffect(() => {
-    if (!currentUser) {
-      setLoading(false);
-      return;
-    }
+    if (!currentUser) return;
 
-    setLoading(true);
-    const profileRef = doc(db, `users/${currentUser.uid}/profile`, "data");
-    const unsubscribe = onSnapshot(profileRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setUserProfile(docSnap.data());
-      } else {
-        console.log("No such profile document!");
-        setUserProfile(null);
+    const q = query(collection(db, `users/${currentUser.uid}/weightLogs`), orderBy("timestamp", "asc"));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const logs = querySnapshot.docs.map(doc => doc.data());
+
+      if (logs.length > 0) {
+        const labels = logs.map(log => new Date(log.timestamp.seconds * 1000).toLocaleDateString());
+        const weights = logs.map(log => log.weight);
+
+        setChartData({
+          labels: labels,
+          datasets: [
+            {
+              label: t('weightProgressChart'),
+              data: weights,
+              borderColor: 'rgb(59, 130, 246)',
+              backgroundColor: 'rgba(59, 130, 246, 0.5)',
+              tension: 0.1,
+            },
+          ],
+        });
       }
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching profile for progress:", error);
-      setLoading(false);
+      setLoading(false); // Veri geldikten sonra yüklenmeyi bitir
     });
 
     return () => unsubscribe();
-  }, [currentUser]);
+  }, [currentUser, t]);
 
-  const { t } = useLanguage();
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+  };
 
+  // Yükleniyorsa iskelet göster
   if (loading) {
-    return <SkeletonCard className="h-96" />; // Skeleton for the main chart area
+    return <SkeletonCard className="w-full h-96" />;
   }
 
   return (
     <Card>
-      <h3 className="text-2xl font-bold text-gray-800 mb-6">{t('weightProgressChart')}</h3>
-      {userProfile?.weightHistory && userProfile.weightHistory.length >= 2 ? (
-        <WeightProgressChart weightHistory={userProfile.weightHistory} />
-      ) : (
-        <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg text-gray-500 text-center p-4">
-          <p>{t('addTwoEntries')}</p>
-        </div>
-      )}
+      <h3 className="text-xl font-semibold text-gray-800 mb-4">{t('weightProgressChart')}</h3>
+      <div className="w-full h-96">
+        {chartData && chartData.labels.length >= 2 ? (
+          <Line data={chartData} options={options} />
+        ) : (
+          <div className="flex items-center justify-center h-full text-center text-gray-500">
+            <p>{t('addTwoEntries')}</p>
+          </div>
+        )}
+      </div>
     </Card>
   );
 };
