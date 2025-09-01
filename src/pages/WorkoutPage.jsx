@@ -6,7 +6,7 @@ import { collection, doc, query, orderBy, onSnapshot, addDoc, updateDoc, deleteD
 import WorkoutPlanList from '../components/workout/WorkoutPlanList';
 import PlanDetails from '../components/workout/PlanDetails';
 import ExerciseLibrary from '../components/workout/ExerciseLibrary';
-import AiWorkoutWizard from '../components/workout/AiWorkoutWizard';
+import PlanWizardModal from '../components/workout/PlanWizardModal';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
@@ -212,7 +212,7 @@ const WorkoutPage = () => {
 
       {isUpgradeModalOpen && <UpgradeModal isOpen={isUpgradeModalOpen} onClose={() => setIsUpgradeModalOpen(false)} />}
       {isAiWizardOpen && (
-        <AiWorkoutWizard 
+        <PlanWizardModal 
           isOpen={isAiWizardOpen} 
           onClose={() => setIsAiWizardOpen(false)} 
           onPlanGenerated={handleAiPlanGenerated} 
