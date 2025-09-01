@@ -1,11 +1,14 @@
 // src/pages/DashboardPage.jsx
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import Header from '../components/layout/Header';
-import NutritionPage from './NutritionPage';
-import WorkoutPage from './WorkoutPage';
-import ProgressPage from './ProgressPage';
-import CommunityPage from './CommunityPage';
+import Spinner from '../components/common/Spinner';
+
+// Lazy load the content pages
+const NutritionPage = lazy(() => import('./NutritionPage'));
+const WorkoutPage = lazy(() => import('./WorkoutPage'));
+const ProgressPage = lazy(() => import('./ProgressPage'));
+const CommunityPage = lazy(() => import('./CommunityPage'));
 
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState('nutrition');
@@ -50,7 +53,13 @@ const DashboardPage = () => {
           </nav>
         </div>
         <main>
-          {renderContent()}
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-96">
+              <Spinner />
+            </div>
+          }>
+            {renderContent()}
+          </Suspense>
         </main>
       </div>
     </div>
