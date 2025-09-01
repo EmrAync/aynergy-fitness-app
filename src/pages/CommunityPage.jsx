@@ -1,5 +1,5 @@
 // src/pages/CommunityPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { db } from '../services/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import Card from '../components/common/Card';
@@ -8,6 +8,7 @@ import Button from '../components/common/Button';
 import Spinner from '../components/common/Spinner';
 import UserProfileView from '../components/community/UserProfileView';
 import { useLanguage } from '../contexts/LanguageContext';
+import SkeletonCard from '../components/common/SkeletonCard'; // Import SkeletonCard
 
 const CommunityPage = () => {
   const { t } = useLanguage();
@@ -19,6 +20,7 @@ const CommunityPage = () => {
   const handleSearch = async () => {
     if (!searchTerm) {
       setSearchResults([]);
+      setSelectedUserId(null); // Clear selected user when search term is empty
       return;
     }
     setLoading(true);
@@ -58,12 +60,16 @@ const CommunityPage = () => {
               placeholder={t('search')}
             />
           </div>
-          <Button onClick={handleSearch} className="w-auto">{t('search')}</Button>
+          <Button onClick={handleSearch} className="w-auto px-4 py-2" disabled={loading}>
+            {loading ? <Spinner className="w-4 h-4" /> : t('search')}
+          </Button>
         </div>
 
         {loading ? (
-          <div className="flex justify-center mt-8">
-            <Spinner />
+          <div className="space-y-3 mt-8">
+            <SkeletonCard className="h-12 w-full" />
+            <SkeletonCard className="h-12 w-full" />
+            <SkeletonCard className="h-12 w-full" />
           </div>
         ) : searchResults.length > 0 ? (
           <ul className="space-y-2">
@@ -71,7 +77,7 @@ const CommunityPage = () => {
               <li key={user.id}>
                 <button
                   onClick={() => setSelectedUserId(user.userId)}
-                  className="w-full text-left py-2 px-4 rounded-md transition-colors duration-200 hover:bg-gray-100"
+                  className="w-full text-left py-3 px-4 rounded-lg transition-colors duration-200 hover:bg-gray-100 text-lg text-gray-800"
                 >
                   {user.name}
                 </button>

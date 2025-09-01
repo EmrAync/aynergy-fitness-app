@@ -2,159 +2,222 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../services/firebase';
-import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, query, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import WorkoutPlanList from '../components/workout/WorkoutPlanList';
 import PlanDetails from '../components/workout/PlanDetails';
 import ExerciseLibrary from '../components/workout/ExerciseLibrary';
-import Spinner from '../components/common/Spinner';
-import PremiumFeatureLocker from '../components/premium/PremiumFeatureLocker';
+import AiWorkoutWizard from '../components/workout/AiWorkoutWizard';
+import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
+import { useNotification } from '../contexts/NotificationContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import Card from '../components/common/Card';
-import PlanWizardModal from '../components/workout/PlanWizardModal';
+import UpgradeModal from '../components/premium/UpgradeModal';
+import SkeletonCard from '../components/common/SkeletonCard'; // Import SkeletonCard
 
 const WorkoutPage = () => {
   const { currentUser, userProfile } = useAuth();
   const { t } = useLanguage();
-  const [plans, setPlans] = useState([]);
-  const [selectedPlanId, setSelectedPlanId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const selectedPlan = plans.find(plan => plan.id === selectedPlanId) || null;
-  const [newPlanName, setNewPlanName] = useState('');
-  const [wizardOpen, setWizardOpen] = useState(false);
+  const { notifySuccess, notifyError } = useNotification();
 
-  const isPremiumUser = userProfile?.subscription?.status === 'premium';
-  const hasFreePlan = plans.length > 0;
-  const planLimitReached = !isPremiumUser && hasFreePlan;
+  const [workoutPlans, setWorkoutPlans] = useState([]);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [newPlanName, setNewPlanName] = useState('');
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [isAiWizardOpen, setIsAiWizardOpen] = useState(false);
+  const [loading, setLoading] = useState(true); // Loading state for workout plans
+
+  const MAX_FREE_PLANS = 3;
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
 
+    setLoading(true);
     const plansRef = collection(db, `users/${currentUser.uid}/workoutPlans`);
-    const unsubscribe = onSnapshot(plansRef, (snapshot) => {
+    const q = query(plansRef, orderBy("createdAt", "desc"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const plansData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setPlans(plansData);
-      if (plansData.length > 0 && !selectedPlanId) {
-        setSelectedPlanId(plansData[0].id);
+      setWorkoutPlans(plansData);
+      if (selectedPlan) {
+        // If a plan was selected, try to re-select it to update its data
+        const updatedSelected = plansData.find(plan => plan.id === selectedPlan.id);
+        setSelectedPlan(updatedSelected || null);
       }
       setLoading(false);
     }, (error) => {
       console.error("Error fetching workout plans:", error);
+      notifyError("Failed to load workout plans.");
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [currentUser, selectedPlanId]);
+  }, [currentUser]);
 
   const handleCreatePlan = async () => {
-    if (!currentUser || newPlanName === '') return;
-    if (planLimitReached) return;
+    if (!currentUser || !newPlanName.trim()) return;
 
-    const plansRef = collection(db, `users/${currentUser.uid}/workoutPlans`);
-    await addDoc(plansRef, {
-      name: newPlanName,
-      exercises: []
-    });
-    setNewPlanName('');
-  };
-  
-  const handlePlanGenerated = async (plan) => {
-    if (!currentUser) return;
-    const plansRef = collection(db, `users/${currentUser.uid}/workoutPlans`);
-    await addDoc(plansRef, plan);
-  };
-  
-  const handleAddExerciseToPlan = async (exercise) => {
-    if (!currentUser || !selectedPlanId) return;
-    const planRef = doc(db, `users/${currentUser.uid}/workoutPlans`, selectedPlanId);
-    
-    const newExercise = { ...exercise, sets: [] };
+    if (userProfile?.subscription?.status !== 'premium' && workoutPlans.length >= MAX_FREE_PLANS) {
+      setIsUpgradeModalOpen(true);
+      return;
+    }
 
-    const updatedExercises = [...selectedPlan.exercises, newExercise];
-    await updateDoc(planRef, { exercises: updatedExercises });
-  };
-  
-  const handleAddSetToExercise = async (planId, exerciseIndex, newSet) => {
-    if (!currentUser) return;
-
-    const planRef = doc(db, `users/${currentUser.uid}/workoutPlans`, planId);
-    
-    const planToUpdate = plans.find(p => p.id === planId);
-    if (!planToUpdate) return;
-    
-    const updatedExercises = JSON.parse(JSON.stringify(planToUpdate.exercises));
-    
-    updatedExercises[exerciseIndex].sets.push(newSet);
-    
-    await updateDoc(planRef, { exercises: updatedExercises });
+    try {
+      await addDoc(collection(db, `users/${currentUser.uid}/workoutPlans`), {
+        name: newPlanName,
+        exercises: [],
+        createdAt: new Date(),
+      });
+      setNewPlanName('');
+      notifySuccess("Workout plan created!");
+    } catch (error) {
+      console.error("Error creating workout plan:", error);
+      notifyError("Failed to create workout plan.");
+    }
   };
 
   const handleDeletePlan = async (planId) => {
-    if (!currentUser) return;
-    const planRef = doc(db, `users/${currentUser.uid}/workoutPlans`, planId);
-    await deleteDoc(planRef);
-    setSelectedPlanId(null);
+    if (!currentUser || !planId) return;
+    try {
+      await deleteDoc(doc(db, `users/${currentUser.uid}/workoutPlans`, planId));
+      setSelectedPlan(null); // Deselect the plan if it was deleted
+      notifySuccess("Workout plan deleted.");
+    } catch (error) {
+      console.error("Error deleting workout plan:", error);
+      notifyError("Failed to delete workout plan.");
+    }
+  };
+
+  const handleAddExerciseToPlan = async (exercise) => {
+    if (!currentUser || !selectedPlan) {
+      notifyError("Please select a plan first.");
+      return;
+    }
+    try {
+      const planRef = doc(db, `users/${currentUser.uid}/workoutPlans`, selectedPlan.id);
+      const currentPlan = (await getDoc(planRef)).data();
+      const updatedExercises = [...currentPlan.exercises, { ...exercise, sets: [] }];
+      await updateDoc(planRef, { exercises: updatedExercises });
+      notifySuccess(`${exercise.name} added to ${selectedPlan.name}.`);
+    } catch (error) {
+      console.error("Error adding exercise to plan:", error);
+      notifyError("Failed to add exercise.");
+    }
+  };
+
+  const handleAddSetToExercise = async (planId, exerciseIndex, newSet) => {
+    if (!currentUser || !planId || exerciseIndex === undefined) return;
+    try {
+      const planRef = doc(db, `users/${currentUser.uid}/workoutPlans`, planId);
+      const currentPlan = (await getDoc(planRef)).data();
+      const updatedExercises = [...currentPlan.exercises];
+      if (!updatedExercises[exerciseIndex].sets) {
+        updatedExercises[exerciseIndex].sets = [];
+      }
+      updatedExercises[exerciseIndex].sets.push(newSet);
+      await updateDoc(planRef, { exercises: updatedExercises });
+      notifySuccess("Set added successfully.");
+    } catch (error) {
+      console.error("Error adding set to exercise:", error);
+      notifyError("Failed to add set.");
+    }
+  };
+
+  const handleAiPlanGenerated = async (aiPlan) => {
+    if (!currentUser || !aiPlan.name) return;
+
+    if (userProfile?.subscription?.status !== 'premium' && workoutPlans.length >= MAX_FREE_PLANS) {
+      setIsAiWizardOpen(false);
+      setIsUpgradeModalOpen(true);
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, `users/${currentUser.uid}/workoutPlans`), {
+        name: aiPlan.name,
+        exercises: aiPlan.exercises,
+        createdAt: new Date(),
+        generatedByAi: true,
+      });
+      notifySuccess("AI Workout plan added!");
+      setIsAiWizardOpen(false); // Close wizard after plan is added
+    } catch (error) {
+      console.error("Error adding AI workout plan:", error);
+      notifyError("Failed to add AI workout plan.");
+    }
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full">
-        <Spinner />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left column for WorkoutPlanList and AI Wizard button */}
+        <div className="lg:col-span-1 space-y-6">
+          <SkeletonCard className="h-40" /> {/* For create plan input */}
+          <SkeletonCard className="h-64" /> {/* For plan list */}
+          <SkeletonCard className="h-20" /> {/* For AI Wizard button */}
+        </div>
+        {/* Middle column for PlanDetails */}
+        <div className="lg:col-span-1">
+          <SkeletonCard className="h-[calc(100vh-180px)]" />
+        </div>
+        {/* Right column for ExerciseLibrary */}
+        <div className="lg:col-span-1">
+          <SkeletonCard className="h-[calc(100vh-180px)]" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="md:col-span-1 space-y-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Left Column: Workout Plans List and AI Wizard */}
+      <div className="lg:col-span-1 space-y-6">
         <Card>
           <h3 className="text-xl font-semibold mb-4">{t('myWorkoutPlans')}</h3>
-          <div className="flex space-x-2 mb-6">
-            <div className="flex-grow">
-              <Input 
-                value={newPlanName} 
-                onChange={(e) => setNewPlanName(e.target.value)} 
-                placeholder={t('enterPlanName')}
-              />
-            </div>
-            <PremiumFeatureLocker featureLimit={isPremiumUser ? null : (plans.length >= 1 ? 1 : 0)}>
-              <Button onClick={handleCreatePlan} className="w-auto">{t('createPlan')}</Button>
-            </PremiumFeatureLocker>
+          <div className="flex space-x-2 mb-4">
+            <Input
+              placeholder={t('enterPlanName')}
+              value={newPlanName}
+              onChange={(e) => setNewPlanName(e.target.value)}
+            />
+            <Button onClick={handleCreatePlan} className="w-auto px-4 py-2">{t('createPlan')}</Button>
           </div>
-          <Button onClick={() => setWizardOpen(true)} className="w-full bg-green-600 hover:bg-green-700">
-            {t('createWithAIWizard')}
-          </Button>
-          {planLimitReached && (
-            <p className="text-sm text-red-500 mt-4">{t('freePlanLimitReached')}</p>
-          )}
-          <ul className="space-y-2 mt-6">
-            {plans.map((plan) => (
-              <li key={plan.id}>
-                <button 
-                  onClick={() => setSelectedPlanId(plan.id)}
-                  className="w-full text-left py-2 px-4 rounded-md transition-colors duration-200 hover:bg-gray-100"
-                >
-                  {plan.name}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <WorkoutPlanList
+            plans={workoutPlans}
+            onSelectPlan={setSelectedPlan}
+            selectedPlanId={selectedPlan?.id}
+          />
         </Card>
-        <PlanDetails 
-          selectedPlan={selectedPlan} 
+        <Button onClick={() => setIsAiWizardOpen(true)} className="bg-green-600 hover:bg-green-700 w-full flex items-center justify-center space-x-2 text-lg py-3">
+          <span>{t('createWithAIWizard')}</span>
+        </Button>
+      </div>
+
+      {/* Middle Column: Plan Details */}
+      <div className="lg:col-span-1">
+        <PlanDetails
+          selectedPlan={selectedPlan}
           onDeletePlan={handleDeletePlan}
           onAddSet={handleAddSetToExercise}
         />
       </div>
-      <div className="md:col-span-2">
+
+      {/* Right Column: Exercise Library */}
+      <div className="lg:col-span-1">
         <ExerciseLibrary onAddExercise={handleAddExerciseToPlan} />
       </div>
-      <PlanWizardModal 
-        isOpen={wizardOpen} 
-        onClose={() => setWizardOpen(false)} 
-        onPlanGenerated={handlePlanGenerated}
-      />
+
+      {isUpgradeModalOpen && <UpgradeModal isOpen={isUpgradeModalOpen} onClose={() => setIsUpgradeModalOpen(false)} />}
+      {isAiWizardOpen && (
+        <AiWorkoutWizard 
+          isOpen={isAiWizardOpen} 
+          onClose={() => setIsAiWizardOpen(false)} 
+          onPlanGenerated={handleAiPlanGenerated} 
+        />
+      )}
     </div>
   );
 };
