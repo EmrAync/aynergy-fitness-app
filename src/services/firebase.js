@@ -4,12 +4,12 @@ import { getAuth } from "firebase/auth";
 import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBI_P7JETWgpNmrF4KYTAjHoyvDBr34vQQ",
-  authDomain: "synergy-fitness.firebaseapp.com",
-  projectId: "synergy-fitness",
-  storageBucket: "synergy-fitness.firebasestorage.app",
-  messagingSenderId: "379120684453",
-  appId: "1:379120684453:web:64a6521f976ecd56e2ec4c"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);
@@ -24,10 +24,8 @@ try {
     })
     .catch((err) => {
       if (err.code === 'failed-precondition') {
-        // Multiple tabs open, persistence can only be enabled in one.
         console.warn("Firestore offline persistence could not be enabled. It's likely open in another tab.");
       } else if (err.code === 'unimplemented') {
-        // The current browser does not support all of the features required to enable persistence
         console.error("The current browser does not support offline persistence.");
       } else {
         console.error("Error enabling offline persistence: ", err);
