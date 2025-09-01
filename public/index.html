@@ -2,25 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Bu satırı silebilir veya kendi ikonunuzla değiştirebilirsiniz -->
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- PWA için gerekli satırlar -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#ffffff" />
+
     <title>Synergy Fitness</title>
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- React uygulamasını başlatan ana komut -->
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- PWA'i çalıştıran Service Worker komutu -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-              console.log('Service Worker registered successfully:', registration);
-            })
-            .catch(error => {
-              console.error('Service Worker registration failed:', error);
-            });
+          navigator.serviceWorker.register('/sw.js');
         });
       }
     </script>
