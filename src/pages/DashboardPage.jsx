@@ -1,5 +1,5 @@
 // src/pages/DashboardPage.jsx
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState, Suspense, lazy, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import Header from '../components/layout/Header';
 import Spinner from '../components/common/Spinner';
@@ -14,6 +14,18 @@ const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState('nutrition');
   const { t } = useLanguage();
   
+  // Preload non-active tabs after a delay
+  useEffect(() => {
+    const preloadTimer = setTimeout(() => {
+      console.log("Preloading other tab components...");
+      import('./WorkoutPage');
+      import('./ProgressPage');
+      import('./CommunityPage');
+    }, 2000); // Wait 2 seconds before preloading
+
+    return () => clearTimeout(preloadTimer);
+  }, []);
+
   const renderContent = () => {
     switch (activeTab) {
       case 'nutrition':
