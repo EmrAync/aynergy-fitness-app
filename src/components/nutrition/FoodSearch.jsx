@@ -4,6 +4,7 @@ import useDebounce from '../../hooks/useDebounce';
 import { searchFoods } from '../../services/nutritionApi';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Input from '../common/Input';
+import Spinner from '../common/Spinner'; // Spinner'ı ekliyoruz
 
 const FoodSearch = ({ onFoodSelect }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,7 +36,9 @@ const FoodSearch = ({ onFoodSelect }) => {
         placeholder={t('searchFoodPlaceholder')}
       />
       {loading && (
-        <div className="mt-2 text-center text-gray-500">{t('searching')}</div>
+        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+          <Spinner />
+        </div>
       )}
       {results.length > 0 && (
         <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-md mt-1 shadow-lg max-h-60 overflow-y-auto">
@@ -49,12 +52,15 @@ const FoodSearch = ({ onFoodSelect }) => {
               }}
               className="px-4 py-2 cursor-pointer hover:bg-gray-100 transition-colors"
             >
-              {food.name}
+              <div className="font-semibold">{food.name}</div>
+              <div className="text-sm text-gray-500">
+                {Math.round(food.caloriesPer100g)} kcal, P: {Math.round(food.proteinPer100g)}g, C: {Math.round(food.carbsPer100g)}g, F: {Math.round(food.fatPer100g)}g
+              </div>
             </li>
           ))}
         </ul>
       )}
-      {!loading && searchTerm && results.length === 0 && (
+      {!loading && debouncedSearchTerm && results.length === 0 && (
         <div className="mt-2 text-center text-gray-500">{t('noResults')}</div>
       )}
     </div>
