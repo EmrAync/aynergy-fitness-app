@@ -1,17 +1,32 @@
-// firestore.rules
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Kullanıcıların kendi profillerine, yemeklerine, antrenman planlarına ve kilo kayıtlarına erişmesine izin ver.
+
+    // Kullanıcının kendi profilini okuma/yazma yetkisi
+    match /users/{userId}/profile/{docId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+
+    // Yöneticilerin diğer kullanıcıların profillerini okuma yetkisi
+    match /users/{userId}/profile/{docId} {
+      allow read: if get(/databases/$(database)/documents/users/$(request.auth.uid)/profile/data).data.role == 'admin';
+    }
+
+    // Kullanıcının kendi diğer verilerini okuma/yazma yetkisi (meals, workoutPlans vb.)
     match /users/{userId}/{collection}/{docId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // 'profile' koleksiyonu yukarıda zaten tanımlandığı için hariç tutuyoruz.
+      allow read, write: if request.auth.uid == userId && collection != 'profile';
+    }
+
+    // Yöneticilerin diğer kullanıcıların antrenman planlarını okuma/yazma (atama) yetkisi
+    match /users/{userId}/workoutPlans/{planId} {
+      allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)/profile/data).data.role == 'admin';
     }
 
     // Herkesin herkese açık profilleri görmesine izin ver.
-    // Kullanıcılar sadece kendi herkese açık profillerini yazabilir.
     match /publicProfiles/{userId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth.uid == userId;
     }
   }
 }

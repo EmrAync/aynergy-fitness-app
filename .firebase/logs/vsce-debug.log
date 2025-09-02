@@ -1,0 +1,108 @@
+[debug] [2025-09-02T09:14:08.559Z] [Firebase Plugin] Activating Firebase extension.
+[debug] [2025-09-02T09:14:08.918Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2025-09-02T09:14:08.919Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-02T09:14:08.920Z] > authorizing via signed-in user (herraynaci@gmail.com)
+[debug] [2025-09-02T09:14:08.927Z] Checked if tokens are valid: true, expires at: 1756806599470
+[debug] [2025-09-02T09:14:08.928Z] Checked if tokens are valid: true, expires at: 1756806599470
+[debug] [2025-09-02T09:14:08.929Z] [Firebase Plugin] User found:  herraynaci@gmail.com
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2025-09-02T09:14:08.932Z] Checked if tokens are valid: true, expires at: 1756806599470
+[debug] [2025-09-02T09:14:08.934Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2025-09-02T09:14:08.950Z] [Firebase Plugin] VSCode notification server listening on port 40001
+[info] [Firebase Plugin] Starting Data Connect toolkit (version 2.11.2) on port 50001
+[info] i  dataconnect: downloading dataconnect-emulator-2.11.2.exe... {"metadata":{"emulator":{"name":"dataconnect"},"message":"downloading dataconnect-emulator-2.11.2.exe..."}}
+[debug] [2025-09-02T09:14:09.601Z] >>> [apiv2][query] GET https://storage.googleapis.com/firemat-preview-drop/emulator/dataconnect-emulator-windows-v2.11.2 
+[debug] [2025-09-02T09:14:09.635Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-09-02T09:14:09.635Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-09-02T09:14:09.833Z] <<< [apiv2][status] GET https://storage.googleapis.com/firemat-preview-drop/emulator/dataconnect-emulator-windows-v2.11.2 200
+[debug] [2025-09-02T09:14:09.834Z] <<< [apiv2][body] GET https://storage.googleapis.com/firemat-preview-drop/emulator/dataconnect-emulator-windows-v2.11.2 [stream]
+[debug] [2025-09-02T09:14:12.651Z] 'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E0902 11:14:12.615404   15284 cmd.go:43] Error loading data connect config: could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E0902 11:14:12.615404   15284 cmd.go:43] Error loading data connect config: could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:14:12.652Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2025-09-02T09:14:12.652Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2025-09-02T09:14:12.652Z] Starting Data Connect Emulator with command {"binary":"C:\\Users\\AynaciE\\.cache\\firebase\\emulators\\dataconnect-emulator-2.11.2.exe","args":["--logtostderr","-v=2","dev","--listen=localhost:50001","--config_dir=d:\\Aynergy-Fitness\\aynergy\\dataconnect","--enable_output_schema_extensions=true","--enable_output_generated_sdk=true"],"optionalArgs":["listen","config_dir","enable_output_schema_extensions","enable_output_generated_sdk"],"joinArgs":true,"shell":false,"port":9399} {"metadata":{"emulator":{"name":"dataconnect"},"message":"Starting Data Connect Emulator with command {\"binary\":\"C:\\\\Users\\\\AynaciE\\\\.cache\\\\firebase\\\\emulators\\\\dataconnect-emulator-2.11.2.exe\",\"args\":[\"--logtostderr\",\"-v=2\",\"dev\",\"--listen=localhost:50001\",\"--config_dir=d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\",\"--enable_output_schema_extensions=true\",\"--enable_output_generated_sdk=true\"],\"optionalArgs\":[\"listen\",\"config_dir\",\"enable_output_schema_extensions\",\"enable_output_generated_sdk\"],\"joinArgs\":true,\"shell\":false,\"port\":9399}"}}
+[info] i  dataconnect: Data Connect Emulator logging to dataconnect-debug.log {"metadata":{"emulator":{"name":"dataconnect"},"message":"Data Connect Emulator logging to \u001b[1mdataconnect-debug.log\u001b[22m"}}
+[debug] [2025-09-02T09:14:12.737Z] E0902 11:14:12.701012   22572 dev.go:79] Failed to load initial config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:14:12.701012   22572 dev.go:79] Failed to load initial config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:14:12.739Z] E0902 11:14:12.737157   22572 watch.go:102] watchAllDir unable to walk dir `d:\Aynergy-Fitness\aynergy\dataconnect`: CreateFile d:\Aynergy-Fitness\aynergy\dataconnect: Das System kann die angegebene Datei nicht finden.
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:14:12.737157   22572 watch.go:102] watchAllDir unable to walk dir `d:\\Aynergy-Fitness\\aynergy\\dataconnect`: CreateFile d:\\Aynergy-Fitness\\aynergy\\dataconnect: Das System kann die angegebene Datei nicht finden.\n"}}
+[debug] [2025-09-02T09:14:12.751Z] I0902 11:14:12.750503   22572 dev.go:102] Listening on address (HTTP + gRPC): 127.0.0.1:50001
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0902 11:14:12.750503   22572 dev.go:102] Listening on address (HTTP + gRPC): 127.0.0.1:50001\n"}}
+[error] [Firebase Plugin] error:  {}
+[debug] [2025-09-02T09:14:22.740Z] E0902 11:14:22.740063   22572 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:14:22.740063   22572 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:14:32.739Z] E0902 11:14:32.739511   22572 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:14:32.739511   22572 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:14:42.741Z] E0902 11:14:42.740586   22572 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:14:42.740586   22572 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:14:52.741Z] E0902 11:14:52.740227   22572 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:14:52.740227   22572 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:15:03.311Z] E0902 11:15:02.748868   22572 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:15:02.748868   22572 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[info] [Firebase Plugin] Stopping Data Connect toolkit
+[warn] !  Data Connect Emulator has exited upon receiving signal: SIGKILL 
+[debug] [2025-09-02T09:15:46.922Z] [Firebase Plugin] Activating Firebase extension.
+[debug] [2025-09-02T09:15:47.475Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2025-09-02T09:15:47.478Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-02T09:15:47.479Z] > authorizing via signed-in user (herraynaci@gmail.com)
+[debug] [2025-09-02T09:15:47.486Z] Checked if tokens are valid: true, expires at: 1756806599470
+[debug] [2025-09-02T09:15:47.486Z] Checked if tokens are valid: true, expires at: 1756806599470
+[debug] [2025-09-02T09:15:47.487Z] [Firebase Plugin] User found:  herraynaci@gmail.com
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2025-09-02T09:15:47.489Z] Checked if tokens are valid: true, expires at: 1756806599470
+[debug] [2025-09-02T09:15:47.491Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2025-09-02T09:15:47.507Z] [Firebase Plugin] VSCode notification server listening on port 40001
+[info] [Firebase Plugin] Starting Data Connect toolkit (version 2.11.2) on port 50001
+[debug] [2025-09-02T09:15:48.088Z] 'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E0902 11:15:48.033173   21552 cmd.go:43] Error loading data connect config: could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E0902 11:15:48.033173   21552 cmd.go:43] Error loading data connect config: could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:15:48.089Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2025-09-02T09:15:48.089Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2025-09-02T09:15:48.090Z] Starting Data Connect Emulator with command {"binary":"C:\\Users\\AynaciE\\.cache\\firebase\\emulators\\dataconnect-emulator-2.11.2.exe","args":["--logtostderr","-v=2","dev","--listen=localhost:50001","--config_dir=d:\\Aynergy-Fitness\\aynergy\\dataconnect","--enable_output_schema_extensions=true","--enable_output_generated_sdk=true"],"optionalArgs":["listen","config_dir","enable_output_schema_extensions","enable_output_generated_sdk"],"joinArgs":true,"shell":false,"port":9399} {"metadata":{"emulator":{"name":"dataconnect"},"message":"Starting Data Connect Emulator with command {\"binary\":\"C:\\\\Users\\\\AynaciE\\\\.cache\\\\firebase\\\\emulators\\\\dataconnect-emulator-2.11.2.exe\",\"args\":[\"--logtostderr\",\"-v=2\",\"dev\",\"--listen=localhost:50001\",\"--config_dir=d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\",\"--enable_output_schema_extensions=true\",\"--enable_output_generated_sdk=true\"],\"optionalArgs\":[\"listen\",\"config_dir\",\"enable_output_schema_extensions\",\"enable_output_generated_sdk\"],\"joinArgs\":true,\"shell\":false,\"port\":9399}"}}
+[info] i  dataconnect: Data Connect Emulator logging to dataconnect-debug.log {"metadata":{"emulator":{"name":"dataconnect"},"message":"Data Connect Emulator logging to \u001b[1mdataconnect-debug.log\u001b[22m"}}
+[debug] [2025-09-02T09:15:48.130Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-09-02T09:15:48.130Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-09-02T09:15:48.242Z] E0902 11:15:48.147602   19468 dev.go:79] Failed to load initial config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:15:48.147602   19468 dev.go:79] Failed to load initial config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:15:48.244Z] E0902 11:15:48.242828   19468 watch.go:102] watchAllDir unable to walk dir `d:\Aynergy-Fitness\aynergy\dataconnect`: CreateFile d:\Aynergy-Fitness\aynergy\dataconnect: Das System kann die angegebene Datei nicht finden.
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:15:48.242828   19468 watch.go:102] watchAllDir unable to walk dir `d:\\Aynergy-Fitness\\aynergy\\dataconnect`: CreateFile d:\\Aynergy-Fitness\\aynergy\\dataconnect: Das System kann die angegebene Datei nicht finden.\n"}}
+[debug] [2025-09-02T09:15:48.274Z] I0902 11:15:48.274717   19468 dev.go:102] Listening on address (HTTP + gRPC): 127.0.0.1:50001
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0902 11:15:48.274717   19468 dev.go:102] Listening on address (HTTP + gRPC): 127.0.0.1:50001\n"}}
+[error] [Firebase Plugin] error:  {}
+[debug] [2025-09-02T09:15:58.246Z] E0902 11:15:58.245974   19468 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:15:58.245974   19468 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:16:03.339Z] [Firebase Plugin] Value of process.env.MONOSPACE_ENV: undefined
+[debug] [2025-09-02T09:16:03.340Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2025-09-02T09:16:03.341Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-02T09:16:03.341Z] > authorizing via signed-in user (herraynaci@gmail.com)
+[debug] [2025-09-02T09:16:03.342Z] Checked if tokens are valid: true, expires at: 1756806599470
+[debug] [2025-09-02T09:16:03.342Z] [Firebase Plugin] User found:  herraynaci@gmail.com
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2025-09-02T09:16:03.342Z] Checked if tokens are valid: true, expires at: 1756806599470
+[debug] [2025-09-02T09:16:03.343Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2025-09-02T09:16:03.352Z] [Firebase Plugin] Value of process.env.MONOSPACE_ENV: undefined
+[debug] [2025-09-02T09:16:03.352Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2025-09-02T09:16:03.353Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-02T09:16:03.353Z] > authorizing via signed-in user (herraynaci@gmail.com)
+[debug] [2025-09-02T09:16:03.354Z] Checked if tokens are valid: true, expires at: 1756806599470
+[debug] [2025-09-02T09:16:03.354Z] [Firebase Plugin] User found:  herraynaci@gmail.com
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2025-09-02T09:16:03.354Z] Checked if tokens are valid: true, expires at: 1756806599470
+[debug] [2025-09-02T09:16:03.355Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2025-09-02T09:16:03.768Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-09-02T09:16:03.769Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-09-02T09:16:03.789Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-09-02T09:16:03.789Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-09-02T09:16:08.248Z] E0902 11:16:08.247519   19468 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:16:08.247519   19468 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:16:18.246Z] E0902 11:16:18.246527   19468 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:16:18.246527   19468 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:16:28.247Z] E0902 11:16:28.246905   19468 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:16:28.246905   19468 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:16:38.247Z] E0902 11:16:38.246483   19468 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:16:38.246483   19468 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:16:48.246Z] E0902 11:16:48.246016   19468 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:16:48.246016   19468 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[debug] [2025-09-02T09:16:58.246Z] E0902 11:16:58.246666   19468 watch.go:31] Failed to load config from "d:\\Aynergy-Fitness\\aynergy\\dataconnect": could not find dataconnect.yaml in `d:\Aynergy-Fitness\aynergy\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0902 11:16:58.246666   19468 watch.go:31] Failed to load config from \"d:\\\\Aynergy-Fitness\\\\aynergy\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Aynergy-Fitness\\aynergy\\dataconnect`\n"}}
+[info] [Firebase Plugin] Stopping Data Connect toolkit
+[warn] !  Data Connect Emulator has exited upon receiving signal: SIGKILL 

@@ -4,45 +4,59 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../services/firebase';
-import { doc, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import Card from '../common/Card';
 import Input from '../common/Input';
 import Button from '../common/Button';
 
 const ProfileSettings = ({ userProfile, onProfileUpdate }) => {
   const { currentUser } = useAuth();
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [height, setHeight] = useState('');
-  const [weight, setWeight] = useState('');
   const { t } = useLanguage();
   const { notifySuccess, notifyError } = useNotification();
 
+  // Form state'ini tek bir obje içinde yönetmek daha modern bir yaklaşımdır.
+  const [formData, setFormData] = useState({
+    name: '',
+    age: '',
+    height: '',
+    weight: '',
+    goal: 'generalFitness', // Yeni alan
+    activityLevel: 'moderate' // Yeni alan
+  });
+
   useEffect(() => {
     if (userProfile) {
-      setName(userProfile.name || '');
-      setAge(userProfile.age || '');
-      setHeight(userProfile.height || '');
-      setWeight(userProfile.weight || '');
+      setFormData({
+        name: userProfile.name || '',
+        age: userProfile.age || '',
+        height: userProfile.height || '',
+        weight: userProfile.weight || '',
+        goal: userProfile.goal || 'generalFitness',
+        activityLevel: userProfile.activityLevel || 'moderate'
+      });
     }
   }, [userProfile]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const updatedData = {
-        name: name,
-        age: parseInt(age) || 0,
-        height: parseFloat(height) || 0,
-        weight: parseFloat(weight) || 0,
+        ...formData,
+        age: parseInt(formData.age) || 0,
+        height: parseFloat(formData.height) || 0,
+        weight: parseFloat(formData.weight) || 0,
       };
       await onProfileUpdate(updatedData);
 
-      // Update public profile
       await setDoc(doc(db, "publicProfiles", currentUser.uid), {
-        name: name,
+        name: formData.name,
         userId: currentUser.uid
-      });
+      }, { merge: true });
 
       notifySuccess(t('profileUpdatedSuccess'));
     } catch (error) {
@@ -55,29 +69,30 @@ const ProfileSettings = ({ userProfile, onProfileUpdate }) => {
     <Card>
       <h3 className="text-xl font-semibold text-gray-800 mb-4">{t('userSettings')}</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input 
-          label={t('name')} 
-          value={name} 
-          onChange={(e) => setName(e.target.value)} 
-        />
-        <Input 
-          label={t('age')} 
-          type="number" 
-          value={age} 
-          onChange={(e) => setAge(e.target.value)} 
-        />
-        <Input 
-          label={t('height')} 
-          type="number" 
-          value={height} 
-          onChange={(e) => setHeight(e.target.value)} 
-        />
-        <Input 
-          label={t('weight')} 
-          type="number" 
-          value={weight} 
-          onChange={(e) => setWeight(e.target.value)} 
-        />
+        <Input label={t('name')} name="name" value={formData.name} onChange={handleChange} />
+        <Input label={t('age')} name="age" type="number" value={formData.age} onChange={handleChange} />
+        <Input label={t('height')} name="height" type="number" value={formData.height} onChange={handleChange} />
+        <Input label={t('weight')} name="weight" type="number" value={formData.weight} onChange={handleChange} />
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">{t('fitnessGoal')}</label>
+          <select name="goal" value={formData.goal} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <option value="fatLoss">{t('fatLoss')}</option>
+            <option value="muscleGain">{t('muscleGain')}</option>
+            <option value="generalFitness">{t('generalFitness')}</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">{t('activityLevel')}</label>
+          <select name="activityLevel" value={formData.activityLevel} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <option value="sedentary">{t('sedentary')}</option>
+            <option value="light">{t('light')}</option>
+            <option value="moderate">{t('moderate')}</option>
+            <option value="active">{t('active')}</option>
+          </select>
+        </div>
+
         <Button type="submit">{t('updateProfile')}</Button>
       </form>
     </Card>
