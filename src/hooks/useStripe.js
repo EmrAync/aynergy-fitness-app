@@ -7,7 +7,14 @@ const useStripe = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stripeKey = 'pk_test_51P85f92e9Fj1n0o93b8Rk2o3'; // Replace with your actual publishable key
+    // Anahtarı .env dosyasından oku
+    const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+    if (!stripeKey) {
+        console.error("Stripe publishable key is not set in environment variables.");
+        setLoading(false);
+        return;
+    }
+    
     let isMounted = true;
 
     const loadStripeScript = async () => {

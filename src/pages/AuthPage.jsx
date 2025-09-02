@@ -16,15 +16,13 @@ const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [error, setError] = useState('');
   const { notifyError } = useNotification();
 
   const handleAuthAction = async () => {
-    setError('');
     if (isRegisterMode) {
       if (!name) {
         notifyError("Please enter your name.");
-        return setError("Please enter your name.");
+        return;
       }
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -38,14 +36,12 @@ const AuthPage = () => {
         });
       } catch (err) {
         notifyError(err.message);
-        setError(err.message);
       }
     } else {
       try {
         await signInWithEmailAndPassword(auth, email, password);
       } catch (err) {
         notifyError(err.message);
-        setError(err.message);
       }
     }
   };
@@ -62,8 +58,6 @@ const AuthPage = () => {
           )}
           <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
           <div className="pt-2">
             <Button onClick={handleAuthAction}>

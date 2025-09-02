@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../services/firebase';
-import { collection, doc, query, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { collection, doc, query, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
 import WorkoutPlanList from '../components/workout/WorkoutPlanList';
 import PlanDetails from '../components/workout/PlanDetails';
 import ExerciseLibrary from '../components/workout/ExerciseLibrary';
@@ -13,7 +13,7 @@ import Input from '../components/common/Input';
 import { useNotification } from '../contexts/NotificationContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import UpgradeModal from '../components/premium/UpgradeModal';
-import SkeletonCard from '../components/common/SkeletonCard'; // Import SkeletonCard
+import SkeletonCard from '../components/common/SkeletonCard';
 
 const WorkoutPage = () => {
   const { currentUser, userProfile } = useAuth();
@@ -21,11 +21,11 @@ const WorkoutPage = () => {
   const { notifySuccess, notifyError } = useNotification();
 
   const [workoutPlans, setWorkoutPlans] = useState([]);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedPlanId, setSelectedPlanId] = useState(null); // Sadece ID'yi tutuyoruz
   const [newPlanName, setNewPlanName] = useState('');
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isAiWizardOpen, setIsAiWizardOpen] = useState(false);
-  const [loading, setLoading] = useState(true); // Loading state for workout plans
+  const [loading, setLoading] = useState(true);
 
   const MAX_FREE_PLANS = 3;
 
@@ -42,11 +42,6 @@ const WorkoutPage = () => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const plansData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setWorkoutPlans(plansData);
-      if (selectedPlan) {
-        // If a plan was selected, try to re-select it to update its data
-        const updatedSelected = plansData.find(plan => plan.id === selectedPlan.id);
-        setSelectedPlan(updatedSelected || null);
-      }
       setLoading(false);
     }, (error) => {
       console.error("Error fetching workout plans:", error);
@@ -55,7 +50,7 @@ const WorkoutPage = () => {
     });
 
     return () => unsubscribe();
-  }, [currentUser]);
+  }, [currentUser, notifyError]);
 
   const handleCreatePlan = async () => {
     if (!currentUser || !newPlanName.trim()) return;
@@ -83,7 +78,7 @@ const WorkoutPage = () => {
     if (!currentUser || !planId) return;
     try {
       await deleteDoc(doc(db, `users/${currentUser.uid}/workoutPlans`, planId));
-      setSelectedPlan(null); // Deselect the plan if it was deleted
+      setSelectedPlanId(null); // ID'yi temizle
       notifySuccess("Workout plan deleted.");
     } catch (error) {
       console.error("Error deleting workout plan:", error);
@@ -92,14 +87,16 @@ const WorkoutPage = () => {
   };
 
   const handleAddExerciseToPlan = async (exercise) => {
-    if (!currentUser || !selectedPlan) {
+    if (!currentUser || !selectedPlanId) {
       notifyError("Please select a plan first.");
       return;
     }
+    const selectedPlan = workoutPlans.find(p => p.id === selectedPlanId);
+    if (!selectedPlan) return;
+
     try {
-      const planRef = doc(db, `users/${currentUser.uid}/workoutPlans`, selectedPlan.id);
-      const currentPlan = (await getDoc(planRef)).data();
-      const updatedExercises = [...currentPlan.exercises, { ...exercise, sets: [] }];
+      const planRef = doc(db, `users/${currentUser.uid}/workoutPlans`, selectedPlanId);
+      const updatedExercises = [...selectedPlan.exercises, { ...exercise, sets: [] }];
       await updateDoc(planRef, { exercises: updatedExercises });
       notifySuccess(`${exercise.name} added to ${selectedPlan.name}.`);
     } catch (error) {
@@ -110,10 +107,13 @@ const WorkoutPage = () => {
 
   const handleAddSetToExercise = async (planId, exerciseIndex, newSet) => {
     if (!currentUser || !planId || exerciseIndex === undefined) return;
+    
+    const planToUpdate = workoutPlans.find(p => p.id === planId);
+    if (!planToUpdate) return;
+
     try {
       const planRef = doc(db, `users/${currentUser.uid}/workoutPlans`, planId);
-      const currentPlan = (await getDoc(planRef)).data();
-      const updatedExercises = [...currentPlan.exercises];
+      const updatedExercises = [...planToUpdate.exercises];
       if (!updatedExercises[exerciseIndex].sets) {
         updatedExercises[exerciseIndex].sets = [];
       }
@@ -125,7 +125,7 @@ const WorkoutPage = () => {
       notifyError("Failed to add set.");
     }
   };
-
+  
   const handleAiPlanGenerated = async (aiPlan) => {
     if (!currentUser || !aiPlan.name) return;
 
@@ -143,27 +143,26 @@ const WorkoutPage = () => {
         generatedByAi: true,
       });
       notifySuccess("AI Workout plan added!");
-      setIsAiWizardOpen(false); // Close wizard after plan is added
+      setIsAiWizardOpen(false);
     } catch (error) {
       console.error("Error adding AI workout plan:", error);
       notifyError("Failed to add AI workout plan.");
     }
   };
 
+  const selectedPlanDetails = workoutPlans.find(plan => plan.id === selectedPlanId);
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column for WorkoutPlanList and AI Wizard button */}
         <div className="lg:col-span-1 space-y-6">
-          <SkeletonCard className="h-40" /> {/* For create plan input */}
-          <SkeletonCard className="h-64" /> {/* For plan list */}
-          <SkeletonCard className="h-20" /> {/* For AI Wizard button */}
+          <SkeletonCard className="h-40" />
+          <SkeletonCard className="h-64" />
+          <SkeletonCard className="h-20" />
         </div>
-        {/* Middle column for PlanDetails */}
         <div className="lg:col-span-1">
           <SkeletonCard className="h-[calc(100vh-180px)]" />
         </div>
-        {/* Right column for ExerciseLibrary */}
         <div className="lg:col-span-1">
           <SkeletonCard className="h-[calc(100vh-180px)]" />
         </div>
@@ -173,7 +172,6 @@ const WorkoutPage = () => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Left Column: Workout Plans List and AI Wizard */}
       <div className="lg:col-span-1 space-y-6">
         <Card>
           <h3 className="text-xl font-semibold mb-4">{t('myWorkoutPlans')}</h3>
@@ -187,8 +185,8 @@ const WorkoutPage = () => {
           </div>
           <WorkoutPlanList
             plans={workoutPlans}
-            onSelectPlan={setSelectedPlan}
-            selectedPlanId={selectedPlan?.id}
+            onSelectPlan={setSelectedPlanId} // Sadece ID'yi gönderiyoruz
+            selectedPlanId={selectedPlanId}
           />
         </Card>
         <Button onClick={() => setIsAiWizardOpen(true)} className="bg-green-600 hover:bg-green-700 w-full flex items-center justify-center space-x-2 text-lg py-3">
@@ -196,16 +194,14 @@ const WorkoutPage = () => {
         </Button>
       </div>
 
-      {/* Middle Column: Plan Details */}
       <div className="lg:col-span-1">
         <PlanDetails
-          selectedPlan={selectedPlan}
+          selectedPlan={selectedPlanDetails} // Bulduğumuz plan detayını gönderiyoruz
           onDeletePlan={handleDeletePlan}
           onAddSet={handleAddSetToExercise}
         />
       </div>
 
-      {/* Right Column: Exercise Library */}
       <div className="lg:col-span-1">
         <ExerciseLibrary onAddExercise={handleAddExerciseToPlan} />
       </div>
