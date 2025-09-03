@@ -8,10 +8,10 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 admin.initializeApp();
 
 // Initialize Stripe with secret key from environment variables
-const stripe = Stripe(functions.config().stripe.secret);
+const stripe = Stripe(process.env.STRIPE_SECRET);
 
 // Initialize Gemini with API key from environment variables
-const genAI = new GoogleGenerativeAI(functions.config().gemini.api_key);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 // The pricing ID for your premium plan in Stripe
