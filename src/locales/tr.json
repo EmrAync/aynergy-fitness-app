@@ -112,5 +112,11 @@
   "aiError": "Üzgünüm, bir hata oluştu. Lütfen tekrar deneyin.",
   "aiWelcomeMessage": "Merhaba! Ben Synergy AI. Fitness ve beslenme yolculuğunda sana nasıl yardımcı olabilirim?",
   "aiPlaceholder": "Bir soru sorun...",
-  "aiAskButton": "Sor"
+  "aiAskButton": "Sor",
+  "friendAdded": "arkadaş olarak eklendi!",
+  "friendAddError": "Arkadaş eklenirken bir hata oluştu.",
+  "addFriend": "Arkadaş Ekle",
+  "activityFeed": "Aktivite Akışı",
+  "completedAWorkout": "adlı antrenmanı tamamladı:",
+  "noFriendActivity": "Arkadaşlarınızın aktivitesi bulunmuyor. Yeni arkadaşlar edinerek onları takip etmeye başlayın!"
 }

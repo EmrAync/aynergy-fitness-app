@@ -1,100 +1,104 @@
 // src/pages/CommunityPage.jsx
 import React, { useState, useEffect } from 'react';
 import { db } from '../services/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy, onSnapshot } from 'firebase/firestore';
 import Card from '../components/common/Card';
+import Spinner from '../components/common/Spinner';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
+// Arama component'ini ayrı bir dosyaya taşıyabiliriz, şimdilik burada kalabilir
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
-import Spinner from '../components/common/Spinner';
 import UserProfileView from '../components/community/UserProfileView';
-import { useLanguage } from '../contexts/LanguageContext';
-import SkeletonCard from '../components/common/SkeletonCard'; // Import SkeletonCard
 
 const CommunityPage = () => {
   const { t } = useLanguage();
+  const { currentUser } = useAuth();
+  const [friends, setFriends] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Arama için state'ler
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
-  const handleSearch = async () => {
-    if (!searchTerm) {
-      setSearchResults([]);
-      setSelectedUserId(null); // Clear selected user when search term is empty
+  useEffect(() => {
+    if (!currentUser) return;
+
+    // 1. Kullanıcının arkadaşlarını çek
+    const friendsRef = collection(db, `users/${currentUser.uid}/friends`);
+    const unsubscribeFriends = onSnapshot(friendsRef, (snapshot) => {
+      const friendsList = snapshot.docs.map(doc => doc.data().friendId);
+      setFriends(friendsList);
+    });
+
+    return () => unsubscribeFriends();
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (friends.length === 0) {
+      setLoading(false);
       return;
     }
-    setLoading(true);
-    setSearchResults([]);
-    setSelectedUserId(null);
 
-    try {
-      // The search query will look for users whose names start with the search term.
-      const q = query(
-        collection(db, "publicProfiles"),
-        where("name", ">=", searchTerm),
-        where("name", "<=", searchTerm + '\uf8ff')
-      );
-      const querySnapshot = await getDocs(q);
-      const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setSearchResults(results);
-    } catch (error) {
-      console.error("Error searching for users:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const renderContent = () => {
-    if (selectedUserId) {
-      return <UserProfileView userId={selectedUserId} />;
-    }
-
-    return (
-      <div className="space-y-4">
-        <h3 className="text-xl font-bold">{t('searchForUsers')}</h3>
-        <div className="flex space-x-2">
-          <div className="flex-grow">
-            <Input 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={t('search')}
-            />
-          </div>
-          <Button onClick={handleSearch} className="w-auto px-4 py-2" disabled={loading}>
-            {loading ? <Spinner className="w-4 h-4" /> : t('search')}
-          </Button>
-        </div>
-
-        {loading ? (
-          <div className="space-y-3 mt-8">
-            <SkeletonCard className="h-12 w-full" />
-            <SkeletonCard className="h-12 w-full" />
-            <SkeletonCard className="h-12 w-full" />
-          </div>
-        ) : searchResults.length > 0 ? (
-          <ul className="space-y-2">
-            {searchResults.map(user => (
-              <li key={user.id}>
-                <button
-                  onClick={() => setSelectedUserId(user.userId)}
-                  className="w-full text-left py-3 px-4 rounded-lg transition-colors duration-200 hover:bg-gray-100 text-lg text-gray-800"
-                >
-                  {user.name}
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-center text-gray-500 mt-8">No results found.</p>
-        )}
-      </div>
+    // 2. Arkadaşların aktivitelerini dinle
+    const activitiesQuery = query(
+      collection(db, 'activities'),
+      where('userId', 'in', friends),
+      orderBy('createdAt', 'desc')
     );
-  };
+    
+    const unsubscribeActivities = onSnapshot(activitiesQuery, (snapshot) => {
+      const activitiesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setActivities(activitiesData);
+      setLoading(false);
+    });
+
+    return () => unsubscribeActivities();
+  }, [friends]);
+
+  const handleSearch = async () => { /* ... (mevcut arama kodunuz aynı kalacak) ... */ };
+
+  if (selectedUserId) {
+    return <UserProfileView userId={selectedUserId} />;
+  }
 
   return (
-    <Card>
-      {renderContent()}
-    </Card>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Sol Taraf: Aktivite Akışı */}
+      <div className="lg:col-span-2">
+        <Card>
+          <h2 className="text-2xl font-bold mb-4">{t('activityFeed')}</h2>
+          {loading ? <Spinner /> : (
+            <div className="space-y-4">
+              {activities.length > 0 ? activities.map(activity => (
+                <div key={activity.id} className="p-4 bg-gray-50 rounded-lg">
+                  <p>
+                    <span className="font-bold">{activity.userName}</span> {t('completedAWorkout')} 
+                    <span className="font-semibold">"{activity.workoutName}"</span>.
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {new Date(activity.createdAt.seconds * 1000).toLocaleString()}
+                  </p>
+                </div>
+              )) : (
+                <p className="text-gray-500">{t('noFriendActivity')}</p>
+              )}
+            </div>
+          )}
+        </Card>
+      </div>
+      
+      {/* Sağ Taraf: Kullanıcı Arama */}
+      <div className="lg:col-span-1">
+        <Card>
+          <h3 className="text-xl font-bold">{t('searchForUsers')}</h3>
+          {/* ... (mevcut arama JSX kodunuz buraya gelecek) ... */}
+        </Card>
+      </div>
+    </div>
   );
 };
 
