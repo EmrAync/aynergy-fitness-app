@@ -1,1 +1,22 @@
-node_modules
+# Dependencies
+/node_modules
+/functions/node_modules
+
+# Build files
+/dist
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.firebase/logs/
+vsce-debug.log
+
+# Environment variables - GİZLİ DOSYALAR
+.env
+.env.local
+.env.*.local
+functions/.env
+
+# IDE / Editor specific
+.vscode/
