@@ -1,4 +1,161 @@
-/* Ensure this file is processed by PostCSS with Tailwind CSS plugin */
+/* Import Inter font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom base styles */
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply font-sans antialiased text-neutral-900 bg-neutral-50;
+  }
+
+  /* Better focus states */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-neutral-100 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-300 rounded-full hover:bg-neutral-400;
+  }
+
+  /* Selection color */
+  ::selection {
+    @apply bg-primary-200 text-primary-900;
+  }
+}
+
+/* Component layer for reusable styles */
+@layer components {
+  /* Glass effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-lg border border-white/20;
+  }
+
+  .glass-dark {
+    @apply bg-neutral-900/80 backdrop-blur-lg border border-neutral-700/50;
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-600 via-primary-500 to-secondary-500 bg-clip-text text-transparent;
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-soft-lg hover:-translate-y-1;
+  }
+
+  /* Input focus animation */
+  .input-animated {
+    @apply transition-all duration-200 border-2 border-neutral-200
+           focus:border-primary-500 focus:ring-4 focus:ring-primary-100;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary-600 to-primary-500 text-white
+           hover:from-primary-700 hover:to-primary-600
+           shadow-md hover:shadow-lg hover:shadow-primary-500/25
+           active:scale-[0.98] transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-primary-600 border-2 border-primary-200
+           hover:bg-primary-50 hover:border-primary-300
+           active:scale-[0.98] transition-all duration-200;
+  }
+
+  .btn-accent {
+    @apply bg-gradient-to-r from-accent-500 to-accent-400 text-white
+           hover:from-accent-600 hover:to-accent-500
+           shadow-md hover:shadow-lg hover:shadow-accent-500/25
+           active:scale-[0.98] transition-all duration-200;
+  }
+
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-primary-100 text-primary-800;
+  }
+
+  .badge-success {
+    @apply bg-success-100 text-success-800;
+  }
+
+  .badge-warning {
+    @apply bg-warning-100 text-warning-800;
+  }
+
+  .badge-danger {
+    @apply bg-danger-100 text-danger-800;
+  }
+
+  /* Stat card */
+  .stat-card {
+    @apply bg-white rounded-2xl p-6 shadow-soft border border-neutral-100
+           hover:shadow-soft-lg transition-shadow duration-300;
+  }
+
+  /* Navigation tab */
+  .nav-tab {
+    @apply relative px-4 py-3 font-medium text-neutral-500
+           hover:text-primary-600 transition-colors duration-200;
+  }
+
+  .nav-tab.active {
+    @apply text-primary-600;
+  }
+
+  .nav-tab.active::after {
+    @apply content-[''] absolute bottom-0 left-0 right-0 h-0.5
+           bg-gradient-to-r from-primary-600 to-primary-400 rounded-full;
+  }
+}
+
+/* Utility layer for custom utilities */
+@layer utilities {
+  /* Animation delays */
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+
+  /* Text balance for headings */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Gradient border */
+  .border-gradient {
+    border: 2px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, #6366f1, #14b8a6) border-box;
+  }
+}
